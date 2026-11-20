@@ -1,40 +1,28 @@
 @echo off
+chcp 65001 >nul
 
 rem  Inno Setup
 rem  Copyright (C) 1997-2026 Jordan Russell
 rem  Portions by Martijn Laan
 rem  For conditions of distribution and use, see LICENSE.TXT.
 rem
-rem  Batch file to prepare a release
-rem
-rem  Calls setup-sign.bat if it exists to create a signed build, otherwise creates setup.exe without signing
-rem  Signed build also require a setup-presign.bat to exist which should sign all files passed to it
-rem
-rem  This batch files does the following things:
-rem  -Compile and use ISSigTool
-rem  -Compile ISHelpGen
-rem  -Compile ISetup*.chm
-rem  -Compile Inno Setup
-rem  -Run the unit tests
-rem  -Create 32-bit and 64-bit Inno Setup installers
-rem
-rem  Once done the installer can be found in Output
+rem  Arquivo em lote para preparar o release
 
 setlocal
 
 set VER=7.1.1
 
-echo Building Inno Setup %VER%...
+echo Compilando Inno Setup %VER%...
 echo.
 
 cd /d %~dp0
 
 call .\compile.bat x64 ISSigTool
 if errorlevel 1 goto failed
-echo Compiling ISSigTool done
+echo Compilação do ISSigTool concluída
 
-rem  Verify precompiled binaries which are used during compilation
-rem  Note: Other precompiled binaries are verified by Setup.iss
+rem  Verificar binários pré-compilados usados durante a compilação
+rem  Nota: Outros binários pré-compilados são verificados por Setup.iss
 call .\issig.bat verify --key-file=def01.ispublickey ^
   Projects\Src\Compression.LZMADecompressor\Lzma2Decode\ISLzmaDec-x86.obj ^
   Projects\Src\Compression.LZMADecompressor\Lzma2Decode\ISLzmaDec-x64.obj ^
@@ -43,16 +31,16 @@ call .\issig.bat verify --key-file=def01.ispublickey ^
   Projects\Src\Compression.SevenZipDecoder\7zDecode\IS7zDec-x86.obj ^
   Projects\Src\Compression.SevenZipDecoder\7zDecode\IS7zDec-x64.obj
 if errorlevel 1 goto failed
-echo ISSigTool verify done
+echo Verificação do ISSigTool concluída
 
-rem  Embed user's public key into sources
+rem  Incorporar chave pública do usuário nos fontes
 call .\issig.bat embed
 if errorlevel 1 goto failed
-echo ISSigTool embed done
+echo Incorporação da chave no ISSigTool concluída
 
 call .\compile.bat x64 ISHelpGen
 if errorlevel 1 goto failed
-echo Compiling ISHelpGen done
+echo Compilação do ISHelpGen concluída
 
 cd ishelp
 if errorlevel 1 goto failed
@@ -60,13 +48,13 @@ call .\compile.bat
 if errorlevel 1 goto failed
 cd ..
 if errorlevel 1 goto failed
-echo Compiling ISetup*.chm done
+echo Compilação dos arquivos de ajuda ISetup*.chm concluída
 pause
 
 call :build x86
 if errorlevel 1 goto failed
 
-echo Cleaning output of previous build
+echo Limpando arquivos da compilação anterior...
 del Files\ISCmplr.dll Files\ISPP.dll Files\Setup.e32 Files\Setup.e64 Files\SetupCustomStyle.e32 Files\SetupCustomStyle.e64 Files\SetupLdr.e32 Files\SetupLdr.e64
 if errorlevel 1 goto failed
 del Files\ISIDE.exe Files\ISCC.exe Files\ISSigTool.exe Files\ISTestTool.exe
@@ -75,35 +63,35 @@ if errorlevel 1 goto failed
 call :build x64
 if errorlevel 1 goto failed
 
-echo All done!
+echo Tudo pronto!
 pause
 exit /b 0
 
 :failed
-echo *** FAILED ***
+echo *** FALHOU ***
 pause
 exit /b 1
 
 :build
 call .\compile.bat %~1
 if errorlevel 1 exit /b 1
-echo Compiling %~1 Inno Setup done
+echo Compilação do Inno Setup %~1 concluída
 
 Files\ISTestTool.exe Projects\Bin\Script.Test.iss
 if errorlevel 1 exit /b 1
-echo Testing %~1 Inno Setup done
+echo Testes do Inno Setup %~1 concluídos
 
 if exist .\setup-presign.bat (
-  echo - Presigning
+  echo - Pré-assinando
   call .\setup-presign.bat Files\ISCC.exe Files\ISCmplr.dll Files\ISPP.dll
   if errorlevel 1 exit /b 1
-  echo Presign done
+  echo Pré-assinatura concluída
 ) 
 
-rem  Sign using user's private key - also see compile.bat
+rem  Assinar usando a chave privada do usuário - consulte também compile.bat
 call .\issig.bat sign Files\ISCmplr.dll Files\ISPP.dll Files\Setup.e32 Files\Setup.e64 Files\SetupCustomStyle.e32 Files\SetupCustomStyle.e64 Files\SetupLdr.e32 Files\SetupLdr.e64
 if errorlevel 1 exit /b 1
-echo ISSigTool sign %~1 done
+echo Assinatura ISSigTool %~1 concluída
 
 echo - %~1 Setup.exe
 if exist .\setup-sign.bat (
@@ -112,14 +100,14 @@ if exist .\setup-sign.bat (
   files\iscc setup.iss /NS /NSC /D%~1
 )
 if errorlevel 1 exit /b 1
-echo - Renaming %~1 files
+echo - Renomeando arquivos %~1...
 cd output
 if errorlevel 1 exit /b 1
 move /y mysetup.exe innosetup-%VER%-%~1.exe
 if errorlevel 1 exit /b 1
 cd ..
 if errorlevel 1 exit /b 1
-echo Creating %~1 Inno Setup installer done
+echo Criação do instalador do Inno Setup %~1 concluída
 call .\issig.bat sign output\innosetup-%VER%-%~1.exe
 if errorlevel 1 exit /b 1
 

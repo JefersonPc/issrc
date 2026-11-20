@@ -1,11 +1,12 @@
 @echo off
+chcp 65001 >nul
 
 rem  Inno Setup
 rem  Copyright (C) 1997-2026 Jordan Russell
 rem  Portions by Martijn Laan
 rem  For conditions of distribution and use, see LICENSE.TXT.
 rem
-rem  Batch file to compile Inno Setup
+rem  Arquivo em lote para compilar o Inno Setup
 
 setlocal
 
@@ -13,16 +14,16 @@ cd /d %~dp0
 
 if "%1"=="x86" goto archfound
 if "%1"=="x64" goto archfound
-echo Architecture parameter is missing or invalid. Must be "x86" or "x64".
+echo O parâmetro de arquitetura está ausente ou é inválido. Deve ser "x86" ou "x64".
 goto failed2
 :archfound
 
 if exist compilesettings.bat goto compilesettingsfound
 :compilesettingserror
-echo compilesettings.bat is missing or incomplete. It needs to contain
-echo the following line, adjusted for your system:
+echo compilesettings.bat está ausente ou incompleto. Ele precisa conter
+echo a seguinte linha, ajustada para o seu sistema:
 echo.
-echo   set DELPHIXEROOT=C:\Program Files\Embarcadero\RAD Studio\20.0 [Path to Delphi 10.4 Sydney (or later)]
+echo   set DELPHIXEROOT=C:\Program Files\Embarcadero\RAD Studio\20.0 [Caminho para o Delphi 10.4 Sydney (ou superior)]
 goto failed2
 
 :compilesettingsfound
@@ -39,7 +40,7 @@ cd Projects
 if errorlevel 1 goto failed
 
 set EnvOptionsWarn=false
-rem Optional: make it use rc.exe (via bin\cgrc.exe) instead of resinator.exe (via bin64\cgrc.exe)
+rem Opcional: fazer usar rc.exe (via bin\cgrc.exe) em vez de resinator.exe (via bin64\cgrc.exe)
 rem set BRCC_CompilerToUse=msrc
 
 if "%1"=="x64" ( set Bits=64 ) else ( set Bits=32 )
@@ -59,7 +60,7 @@ if /I "%2"=="ishelpgen" (
   echo - %2
   msbuild.exe "%2.dproj" /t:Build /p:Config=Release;Platform=Win%Bits% /nologo
 ) else (
-  echo - Projects.groupproj - Release build group
+  echo - Projects.groupproj - Grupo de compilação Release
   rem This emits warning MSB4056, but that's ok since the build doesn't use COM. Modern MSBuild supports
   rem /noWarn:MSB4056, but the version targeted by Delphi 12.3's rsvars.bat does not. Additionally Delphi's
   rem implementation of build groups does not seem to pass through additional parameters, so even with a
@@ -72,18 +73,18 @@ cd ..
 if errorlevel 1 goto failed
 
 if defined SignFiles (
-  rem  Sign using user's private key - will be overwritten if called by build.bat
+  rem  Assinar usando a chave privada do usuário - será sobrescrita se chamada por build.bat
   call .\issig.bat sign %SignFiles%
   if errorlevel 1 goto failed2
-  echo ISSigTool sign done
+  echo Assinatura ISSigTool concluída
 )
 
-echo Success!
+echo Sucesso!
 
 goto exit
 
 :failed
-echo *** FAILED ***
+echo *** FALHOU ***
 cd ..
 :failed2
 exit /b 1

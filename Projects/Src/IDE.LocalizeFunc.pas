@@ -19,7 +19,8 @@ type
     English, Localized: String;
   end;
 
-  TIDELanguage = (ilEnglish, ilCzech, ilDutch, ilGerman, ilJapanese);
+  TIDELanguage = (ilEnglish, ilCzech, ilDutch, ilGerman, ilJapanese,
+    ilBrazilianPortuguese, ilPortuguese);
 
 procedure InitLocalization(const Lang: TIDELanguage; const Reverse: Boolean = False);
 
@@ -37,7 +38,8 @@ uses
   SysUtils, Actions, Controls, StdCtrls, Menus, Generics.Collections,
   NewTabSet, ScintEdit,
   IDE.LocalizeFunc.Czech, IDE.LocalizeFunc.Dutch, IDE.LocalizeFunc.German,
-  IDE.LocalizeFunc.Japanese;
+  IDE.LocalizeFunc.Japanese, IDE.LocalizeFunc.BrazilianPortuguese,
+  IDE.LocalizeFunc.Portuguese;
 
 var
   TranslationDictionary: TDictionary<String, String>;
@@ -83,6 +85,8 @@ begin
     ilDutch: AddTranslations(DutchIDETranslations);
     ilGerman: AddTranslations(GermanIDETranslations);
     ilJapanese: AddTranslations(JapaneseIDETranslations);
+    ilBrazilianPortuguese: AddTranslations(BrazilianPortugueseIDETranslations);
+    ilPortuguese: AddTranslations(PortugueseIDETranslations);
   end;
   InstallResourceStringHook;
 end;
@@ -187,6 +191,8 @@ function LFmtMessage(const Language: TIDELanguage; const Str: String;
       ilDutch: Result := GetTranslationFrom(DutchIDETranslations, Localized);
       ilGerman: Result := GetTranslationFrom(GermanIDETranslations, Localized);
       ilJapanese: Result := GetTranslationFrom(JapaneseIDETranslations, Localized);
+      ilBrazilianPortuguese: Result := GetTranslationFrom(BrazilianPortugueseIDETranslations, Localized);
+      ilPortuguese: Result := GetTranslationFrom(PortugueseIDETranslations, Localized);
     else
       Result := False;
     end;

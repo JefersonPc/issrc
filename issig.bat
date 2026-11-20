@@ -1,17 +1,18 @@
 @echo off
+chcp 65001 >nul
 
 rem  Inno Setup
 rem  Copyright (C) 1997-2025 Jordan Russell
 rem  Portions by Martijn Laan
 rem  For conditions of distribution and use, see LICENSE.TXT.
 rem
-rem  Batch file to embed the user's public key from compilesettings.bat in
-rem  TrustFunc.AllowedPublicKeys.inc and to export it as def02.ispublickey
-rem  (before compilation) or to sign files using it (after compilation)
+rem  Arquivo em lote para incorporar a chave pública do usuário de compilesettings.bat em
+rem  TrustFunc.AllowedPublicKeys.inc e exportá-la como def02.ispublickey
+rem  (antes da compilação) ou para assinar arquivos usando-a (após a compilação)
 rem
-rem  Also used by build(-ce).bat to verify some precompiled files
+rem  Também usado por build(-ce).bat para verificar alguns arquivos pré-compilados
 rem
-rem  If the user's private key is missing it will be generated
+rem  Se a chave privada do usuário estiver ausente, ela será gerada
 
 setlocal
 
@@ -19,12 +20,12 @@ cd /d %~dp0
 
 if exist compilesettings.bat goto compilesettingsfound
 :compilesettingserror
-echo compilesettings.bat is missing or incomplete. It needs to contain
-echo the following line, adjusted for your system:
+echo compilesettings.bat está ausente ou incompleto. Ele precisa conter
+echo a seguinte linha, ajustada para o seu sistema:
 echo.
-echo   set ISSIGTOOL_KEY_FILE=x:\path\MyKey.isprivatekey
+echo   set ISSIGTOOL_KEY_FILE=x:\caminho\MinhaChave.isprivatekey
 echo.
-echo Keep the path outside of your source tree!
+echo Mantenha o caminho fora da árvore de código-fonte!
 goto failed2
 
 :compilesettingsfound
@@ -35,11 +36,11 @@ if "%ISSIGTOOL_KEY_FILE%"=="" goto compilesettingserror
 rem -------------------------------------------------------------------------
 
 if not exist "%ISSIGTOOL_KEY_FILE%" (
-  echo Missing key file
+  echo Arquivo de chave ausente
   Files\ISSigTool.exe generate-private-key
   if errorlevel 1 goto failed
   if not exist "%ISSIGTOOL_KEY_FILE%" goto failed
-  echo Generating key file done - do not share with others!
+  echo Geração do arquivo de chave concluída - não compartilhe com outras pessoas!
 )
 
 if /I "%1"=="embed" goto embed
@@ -47,7 +48,7 @@ if /I "%1"=="sign" goto signorverify
 if /I "%1"=="verify" goto signorverify
 if not "%1"=="" goto failed
 
-echo Defaulting to embed
+echo Padrão definido para embed (incorporar)
 
 :embed
 set publickeyfile=def02.ispublickey
@@ -59,18 +60,18 @@ if not exist "%targetfile%" goto failed
 powershell.exe -NoProfile -Command "$filePath = '%targetfile%'; $replacementFilePath = '%publickeyfile%'; $startMarker = 'AllowedPublicKey2Text :='; $endMarker = ';'; try { $content = Get-Content -Raw -Path $filePath; $replacementText = Get-Content -Raw -Path $replacementFilePath; $replacementText = $replacementText -replace \"`r`n\", \"' + #13#10 +`r`n'\"; $replacementText = \"'\" + $replacementText + \"'\"; $replacementText = $replacementText -replace \" \+`r`n''\", \"\"; [string] $pattern = '(?s)' + [regex]::Escape($startMarker) + '.*?' + [regex]::Escape($endMarker); if ($content -match $pattern) { $replacement = $startMarker + \"`r`n\" + $replacementText  + $endMarker; $newContent = $content -replace $pattern, $replacement; $utf8NoBomEncoding = New-Object System.Text.UTF8Encoding($false); [System.IO.File]::WriteAllText($filePath, $newContent, $utf8NoBomEncoding); Write-Host \"Embedded public key in $filePath.\"; } else { Write-Host \"Pattern not found in $filePath.\"; exit 1; } } catch { Write-Error (\"Error: $_.Exception.Message\"); exit 1; }"
 if errorlevel 1 goto failed
 
-echo Success!
+echo Sucesso!
 goto exit
 
 :signorverify
 Files\ISSigTool.exe %*
 if errorlevel 1 goto failed
 
-echo Success!
+echo Sucesso!
 goto exit
 
 :failed
-echo *** FAILED ***
+echo *** FALHOU ***
 :failed2
 exit /b 1
 

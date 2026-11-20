@@ -120,6 +120,8 @@ begin
   LanguageComboBox.Items.Add('Nederlands');
   LanguageComboBox.Items.Add('Deutsch');
   LanguageComboBox.Items.Add(#$65E5#$672C#$8A9E);
+  LanguageComboBox.Items.Add('Portugu'#$00EA's Brasileiro');
+  LanguageComboBox.Items.Add('Portugu'#$00EA's (Portugal)');
 end;
 
 procedure TOptionsForm.FormShow(Sender: TObject);

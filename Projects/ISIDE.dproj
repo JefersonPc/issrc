@@ -1,4 +1,4 @@
-﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
         <ProjectGuid>{AA47247E-6E7B-4A22-8740-FB9041C2F93B}</ProjectGuid>
         <MainSource>ISIDE.dpr</MainSource>
@@ -129,6 +129,8 @@
         <DCCReference Include="Src\IDE.LocalizeFunc.Dutch.pas"/>
         <DCCReference Include="Src\IDE.LocalizeFunc.German.pas"/>
         <DCCReference Include="Src\IDE.LocalizeFunc.Japanese.pas"/>
+        <DCCReference Include="Src\IDE.LocalizeFunc.BrazilianPortuguese.pas"/>
+        <DCCReference Include="Src\IDE.LocalizeFunc.Portuguese.pas"/>
         <DCCReference Include="Src\Shared.CompilerInt.pas"/>
         <DCCReference Include="Src\Shared.CompilerInt.Struct.pas"/>
         <DCCReference Include="Src\IDE.OptionsForm.pas">

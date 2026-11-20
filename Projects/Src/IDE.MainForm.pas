@@ -1,4 +1,4 @@
-﻿unit IDE.MainForm;
+unit IDE.MainForm;
 
 {
   Inno Setup
@@ -943,6 +943,11 @@ constructor TMainForm.Create(AOwner: TComponent);
           LANG_DUTCH: MessageLanguage := ilDutch;
           LANG_GERMAN: MessageLanguage := ilGerman;
           LANG_JAPANESE: MessageLanguage := ilJapanese;
+          LANG_PORTUGUESE:
+            if SUBLANGID(GetUILanguage) = SUBLANG_PORTUGUESE_BRAZILIAN then
+              MessageLanguage := ilBrazilianPortuguese
+            else
+              MessageLanguage := ilPortuguese;
         end;
         if MessageLanguage <> ilEnglish then
           CheckUpdatePanelMessage(Ini, 'Language', 0, 1,
@@ -5938,9 +5943,11 @@ begin
   if FTheme.Dark then begin
     { Which one is present depends on the .dproj, see README.md }
     if not TStyleManager.TrySetStyle('Windows Modern Dark SE', False) then
-      TStyleManager.TrySetStyle('Windows11 Modern Dark');
+      if not TStyleManager.TrySetStyle('Windows11 Modern Dark', False) then
+        if not TStyleManager.TrySetStyle('Windows10 Dark', False) then
+          TStyleManager.TrySetStyle('Windows', False);
   end else
-    TStyleManager.TrySetStyle('Windows');
+    TStyleManager.TrySetStyle('Windows', False);
   { Because StyleElements is empty it needs this: with StyleName set to an empty string, dialog boxes
     it opens, such as MsgBox, look broken }
   StyleName := TStyleManager.ActiveStyle.Name;
