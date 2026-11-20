@@ -436,8 +436,8 @@ begin
   WizardStyleMainComboBox.ItemIndex := 1;
   WizardStyleDarkComboBox.Items.AddStrings(['light', 'dark', 'dynamic']);
   WizardStyleDarkComboBox.ItemIndex := 2;
-  WizardStyleSubStyleComboBox.Items.AddStrings(['default', 'polar', 'slate', 'stellar', 'windows11', 'zircon']);
-  WizardStyleSubStyleComboBox.ItemIndex := 4;
+  WizardStyleSubStyleComboBox.Items.AddStrings(['windows11', 'carbon', 'obsidian', 'aquagraphite', 'ruby', 'auric', 'glossy', 'polar', 'slate', 'stellar', 'zircon', 'default']);
+  WizardStyleSubStyleComboBox.ItemIndex := 0;
 
   { ISPP }
   ISPPLabel.Caption := FixLabel(LFmtMessage(SWizardISPPLabel, ['[name]', '#define']));
@@ -754,13 +754,28 @@ procedure TWizardForm.UpdateWizardStyleImages;
   procedure UpdateWizardStyleImage(const WizardStylePngImage: TPngImage; ImageName: String);
   begin
     ImageName := ImageName.Replace('dark windows11', 'dark');
-    const ImageIndex = WizardStyleImageCollection.GetIndexByName(ImageName);
-    if ImageIndex = -1 then
-      raise Exception.CreateFmt('Image name ''%s'' not found', [ImageName]);
-    WizardStylePngImage.Assign(WizardStyleImageCollection.GetSourceImage(ImageIndex, 0, 0));
+    var SubStyle := LowerCase(WizardStyleSubStyleComboBox.Text);
+    var IsCustomModern := (SubStyle = 'carbon') or (SubStyle = 'obsidian') or
+                          (SubStyle = 'aquagraphite') or (SubStyle = 'ruby') or
+                          (SubStyle = 'auric') or (SubStyle = 'glossy');
+
+    var ImageIndex := WizardStyleImageCollection.GetIndexByName(ImageName);
+    if ImageIndex = -1 then begin
+      if ImageName.Contains('dark') or IsCustomModern then
+        ImageIndex := WizardStyleImageCollection.GetIndexByName('modern dark')
+      else
+        ImageIndex := WizardStyleImageCollection.GetIndexByName('modern');
+    end;
+    if ImageIndex <> -1 then
+      WizardStylePngImage.Assign(WizardStyleImageCollection.GetSourceImage(ImageIndex, 0, 0));
   end;
 
 begin
+  var SubStyle := LowerCase(WizardStyleSubStyleComboBox.Text);
+  var IsCustomModern := (SubStyle = 'carbon') or (SubStyle = 'obsidian') or
+                        (SubStyle = 'aquagraphite') or (SubStyle = 'ruby') or
+                        (SubStyle = 'auric') or (SubStyle = 'glossy');
+
   var WizardStyle := GetWizardStyle;
   const Dynamic = WizardStyle.Contains('dynamic');
   if Dynamic then begin
@@ -769,6 +784,9 @@ begin
     WizardStyle := WizardStyle.Replace(' dark', '');
   end;
   UpdateWizardStyleImage(WizardStyleImage.PngImage, WizardStyle);
+
+  if IsCustomModern then
+    UpdateWizardStyleImage(WizardStyleImage.PngImage, 'modern dark');
 
   { To keep things simple this timer is always running but here we do reset it so the new images
     will never be swapped too quickly }
@@ -927,6 +945,13 @@ procedure TWizardForm.WizardStyleComboBoxChange(Sender: TObject);
 begin
   if (WizardStyleDarkComboBox.Text <> 'light') and ((WizardStyleSubStyleComboBox.Text = 'slate') or (WizardStyleSubStyleComboBox.Text = 'stellar') or (WizardStyleSubStyleComboBox.Text = 'zircon')) then
     WizardStyleDarkComboBox.ItemIndex := WizardStyleDarkComboBox.Items.IndexOf('light');
+  if (WizardStyleSubStyleComboBox.Text = 'carbon') or (WizardStyleSubStyleComboBox.Text = 'obsidian') or
+     (WizardStyleSubStyleComboBox.Text = 'aquagraphite') or (WizardStyleSubStyleComboBox.Text = 'ruby') or
+     (WizardStyleSubStyleComboBox.Text = 'auric') or (WizardStyleSubStyleComboBox.Text = 'glossy') or
+     (WizardStyleSubStyleComboBox.Text = 'windows11') then begin
+    if WizardStyleDarkComboBox.Text = 'light' then
+      WizardStyleDarkComboBox.ItemIndex := WizardStyleDarkComboBox.Items.IndexOf('dynamic');
+  end;
   UpdateWizardStyleImages;
 end;
 
@@ -994,7 +1019,7 @@ begin
   Result := WizardStyleMainComboBox.Text;
   if WizardStyleDarkComboBox.ItemIndex <> 0 then
     Result := Result + ' ' + WizardStyleDarkComboBox.Text;
-  if WizardStyleSubStyleComboBox.ItemIndex <> 0 then
+  if not SameText(WizardStyleSubStyleComboBox.Text, 'default') then
     Result := Result + ' ' + WizardStyleSubStyleComboBox.Text;
 end;
 
@@ -1246,11 +1271,30 @@ begin
 
     { Other }
     Setup := Setup + 'SolidCompression=yes' + SNewLine;
-    Setup := Setup + 'WizardStyle=' + GetWizardStyle + SNewLine;
+    var SubStyle := LowerCase(WizardStyleSubStyleComboBox.Text);
+    var VsfFileName := '';
+    if SubStyle = 'carbon' then VsfFileName := 'Carbon.vsf'
+    else if SubStyle = 'obsidian' then VsfFileName := 'Obsidian.vsf'
+    else if SubStyle = 'aquagraphite' then VsfFileName := 'AquaGraphite.vsf'
+    else if SubStyle = 'ruby' then VsfFileName := 'RubyGraphite.vsf'
+    else if SubStyle = 'auric' then VsfFileName := 'Auric.vsf'
+    else if SubStyle = 'glossy' then VsfFileName := 'Glossy.vsf';
+
+    if VsfFileName <> '' then begin
+      var BaseStyle := WizardStyleMainComboBox.Text;
+      if WizardStyleDarkComboBox.ItemIndex <> 0 then
+        BaseStyle := BaseStyle + ' ' + WizardStyleDarkComboBox.Text;
+      Setup := Setup + 'WizardStyle=' + BaseStyle + SNewLine;
+      Setup := Setup + 'WizardStyleFile=compiler:Styles\' + VsfFileName + SNewLine;
+      Setup := Setup + 'WizardStyleFileDynamicDark=compiler:Styles\' + VsfFileName + SNewLine;
+    end else begin
+      Setup := Setup + 'WizardStyle=' + GetWizardStyle + SNewLine;
+    end;
     Setup := Setup + 'WizardSizePercent=115,115' + SNewLine;
     Setup := Setup + 'ShowLanguageDialog=auto' + SNewLine;
-    Setup := Setup + '; WizardSmallImageFile=meu_logo_64x64.bmp' + SNewLine;
-    Setup := Setup + '; WizardImageFile=meu_banner_164x314.bmp' + SNewLine;
+    Setup := Setup + '; Personalizacao visual moderna:' + SNewLine;
+    Setup := Setup + '; WizardSmallImageFile=compiler:Examples\Images\ModernLogo64.bmp' + SNewLine;
+    Setup := Setup + '; WizardImageFile=compiler:Examples\Images\ModernBanner.bmp' + SNewLine;
 
     { Build script }
     if ISPP <> '' then

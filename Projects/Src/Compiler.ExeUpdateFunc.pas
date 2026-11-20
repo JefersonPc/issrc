@@ -883,7 +883,19 @@ type
     else if SameText(StyleFileName, 'builtin:stellar') then
       StyleName := 'STELLAR'
     else if SameText(StyleFileName, 'builtin:zircon') then
-      StyleName := 'ZIRCON';
+      StyleName := 'ZIRCON'
+    else if SameText(StyleFileName, 'builtin:carbon') then
+      StyleName := 'CARBON'
+    else if SameText(StyleFileName, 'builtin:obsidian') then
+      StyleName := 'OBSIDIAN'
+    else if SameText(StyleFileName, 'builtin:aquagraphite') then
+      StyleName := 'AQUAGRAPHITE'
+    else if SameText(StyleFileName, 'builtin:ruby') then
+      StyleName := 'RUBYGRAPHITE'
+    else if SameText(StyleFileName, 'builtin:auric') then
+      StyleName := 'AURIC'
+    else if SameText(StyleFileName, 'builtin:glossy') then
+      StyleName := 'GLOSSY';
     Result := StyleName <> nil;
     if Result then
       Vsf := LoadResourcePointer(M, 'VCLSTYLE', StyleName, True, VsfSize)
@@ -1063,6 +1075,12 @@ begin
             DeleteResource(H, M, 'VCLSTYLE', 'SLATECLASSICO');
             DeleteResourceIfExists(H, M, 'VCLSTYLE', 'STELLAR');
             DeleteResourceIfExists(H, M, 'VCLSTYLE', 'ZIRCON');
+            DeleteResourceIfExists(H, M, 'VCLSTYLE', 'CARBON');
+            DeleteResourceIfExists(H, M, 'VCLSTYLE', 'OBSIDIAN');
+            DeleteResourceIfExists(H, M, 'VCLSTYLE', 'AQUAGRAPHITE');
+            DeleteResourceIfExists(H, M, 'VCLSTYLE', 'RUBYGRAPHITE');
+            DeleteResourceIfExists(H, M, 'VCLSTYLE', 'AURIC');
+            DeleteResourceIfExists(H, M, 'VCLSTYLE', 'GLOSSY');
           end;
         end;
 

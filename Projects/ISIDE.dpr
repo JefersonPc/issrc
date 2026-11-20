@@ -315,6 +315,9 @@ begin
     VCL Styles anyway, for example on older versions of Windows, is not the correct approach:
     TSysPopupStyleHook does not support our use of bitmaps set using MIIM_BITMAP on a TMenuItem, nor
     does it support our fake shortcuts set with SetFakeShortCut. }
+  {$IF RtlVersion >= 36.0}
+  TStyleManager.AutoDiscoverStyleResources := False;
+  {$ENDIF}
   TStyleManager.SystemHooks := TStyleManager.SystemHooks - [shMenus]; { This keeps shDialogs and shTooltips }
 
   { VCL can auto-append shortcut in hints for actions, but we don't want or

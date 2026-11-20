@@ -2752,8 +2752,9 @@ var
       'excludelightbuttons', 'excludelightcontrols',
       'hidebevels',
       'includetitlebar',
-      'polar', 'slate', 'stellar', 'windows11', 'zircon'];
-    StylesGroups: array of Integer = [0, 0, 1, 1, 1, 2, 2, 3, 4, 5, 5, 5, 5, 5];
+      'polar', 'slate', 'stellar', 'windows11', 'zircon',
+      'carbon', 'obsidian', 'aquagraphite', 'ruby', 'auric', 'glossy'];
+    StylesGroups: array of Integer = [0, 0, 1, 1, 1, 2, 2, 3, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5];
   var
     StylesGroupSeen: array [0..5] of Boolean;
   begin
@@ -2779,7 +2780,7 @@ var
         6: SetupHeader.WizardLightControlStyling := wcsOnlyRequired;
         7: Include(SetupHeader.Options, shWizardBevelsHidden);
         8: Include(SetupHeader.Options, shWizardBorderStyled);
-        9..13: WizardStyleSpecial := Styles[R];
+        9..19: WizardStyleSpecial := Styles[R];
       end;
     end;
   end;
