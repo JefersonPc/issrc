@@ -5942,9 +5942,9 @@ begin
     TStyleManager.SystemHooks at startup. }
   if FTheme.Dark then begin
     { Which one is present depends on the .dproj, see README.md }
-    if not TStyleManager.TrySetStyle('Windows Modern Dark SE', False) then
-      if not TStyleManager.TrySetStyle('Windows11 Modern Dark', False) then
-        if not TStyleManager.TrySetStyle('Windows10 Dark', False) then
+    if not TStyleManager.TrySetStyle('Windows10 Dark', False) then
+      if not TStyleManager.TrySetStyle('Windows Modern Dark SE', False) then
+        if not TStyleManager.TrySetStyle('Windows11 Modern Dark', False) then
           TStyleManager.TrySetStyle('Windows', False);
   end else
     TStyleManager.TrySetStyle('Windows', False);

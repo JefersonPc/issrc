@@ -437,7 +437,7 @@ begin
   WizardStyleDarkComboBox.Items.AddStrings(['light', 'dark', 'dynamic']);
   WizardStyleDarkComboBox.ItemIndex := 2;
   WizardStyleSubStyleComboBox.Items.AddStrings(['default', 'polar', 'slate', 'stellar', 'windows11', 'zircon']);
-  WizardStyleSubStyleComboBox.ItemIndex := 0;
+  WizardStyleSubStyleComboBox.ItemIndex := 4;
 
   { ISPP }
   ISPPLabel.Caption := FixLabel(LFmtMessage(SWizardISPPLabel, ['[name]', '#define']));
@@ -1247,6 +1247,10 @@ begin
     { Other }
     Setup := Setup + 'SolidCompression=yes' + SNewLine;
     Setup := Setup + 'WizardStyle=' + GetWizardStyle + SNewLine;
+    Setup := Setup + 'WizardSizePercent=115,115' + SNewLine;
+    Setup := Setup + 'ShowLanguageDialog=auto' + SNewLine;
+    Setup := Setup + '; WizardSmallImageFile=meu_logo_64x64.bmp' + SNewLine;
+    Setup := Setup + '; WizardImageFile=meu_banner_164x314.bmp' + SNewLine;
 
     { Build script }
     if ISPP <> '' then
